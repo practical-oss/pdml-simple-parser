@@ -162,7 +162,10 @@ public class CorePdmlReader {
             currentLineNumber += 1;
             currentColumnNumber = 1;
         } else {
-            currentColumnNumber += 1;
+            // Surrogates are used for Unicode code points > U+FFFF
+            if ( ! Character.isHighSurrogate ( currentChar ) ) {
+                currentColumnNumber += 1;
+            }
         }
 
         if ( currentPosition < PdmlCode.length() ) {

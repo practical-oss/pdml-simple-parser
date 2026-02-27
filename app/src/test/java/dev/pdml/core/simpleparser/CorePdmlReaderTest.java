@@ -35,6 +35,37 @@ class CorePdmlReaderTest {
     }
 
     @Test
+    void lineColumnTest() throws InvalidPdmlException {
+
+        // Unicode code points > U+FFFF (U+1F600 = surrogates 0xD83D 0xDE00)
+
+        String code = "a.b a😀b a\uD83D\uDE00b ";
+        //             123456 789             12
+        CorePdmlReader reader = new CorePdmlReader ( code );
+
+        assertEquals ( 1, reader.currentLineNumber() );
+        assertEquals ( 1, reader.currentColumnNumber() );
+
+        reader.readTag();
+        assertEquals ( 1, reader.currentLineNumber() );
+        assertEquals ( 4, reader.currentColumnNumber() );
+
+        reader.readSeparator();
+        reader.readTag();
+        assertEquals ( 1, reader.currentLineNumber() );
+        assertEquals ( 8, reader.currentColumnNumber() );
+
+        reader.readSeparator();
+        reader.readTag();
+        assertEquals ( 1, reader.currentLineNumber() );
+        assertEquals ( 12, reader.currentColumnNumber() );
+
+        reader.readSeparator();
+        assertEquals ( 1, reader.currentLineNumber() );
+        assertEquals ( 13, reader.currentColumnNumber() );
+    }
+
+    @Test
     void readTag() throws InvalidPdmlException {
 
         expectTag ( "tag1 ", "tag1" );
